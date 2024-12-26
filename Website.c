@@ -5,7 +5,6 @@
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
-//This whole thing is a boilerplate for a socket connection. 
 const char * header = "HTTP/1.1 200 OK\r\n"
 "Content-Type: text/html\r\n"
 "\r\n";
@@ -89,27 +88,25 @@ DWORD WINAPI HandleConnection(LPVOID ClientPointer){
     char message[1024];
     int recv_length;
     puts("Beginning loop.\n");
-    while(1){
-        recv_length = recv(Client, message, 1024, 0);
-        printf("Recv length is: %d\n", recv_length);
-        if(recv_length == SOCKET_ERROR || recv_length == 0){
-            puts("Client Connection broken.");
-            closesocket(Client);
-            break;
-        }
-        else{
-            if(recv_length > 3){
-                char requestType[] = {message[0], message[1], message[2], '\0'};//This only works for GET. I'm killing myself
-                printf("Request type: %s\n", requestType);
-                if(strcmp(requestType, "GET") == 0){
-                    HandleGETRequest(Client, message);        
-                }
-                //send(Client, response, strlen(response), 0);
-                printf("%s", message);
+    recv_length = recv(Client, message, 1024, 0);
+    printf("Recv length is: %d\n", recv_length);
+    if(recv_length == SOCKET_ERROR || recv_length == 0){
+    puts("Client Connection broken.");
+    closesocket(Client);
+    }
+    else{
+        if(recv_length > 3){
+            char requestType[] = {message[0], message[1], message[2], '\0'};//This only works for GET. I'm killing myself
+            printf("Request type: %s\n", requestType);
+            if(strcmp(requestType, "GET") == 0){
+                HandleGETRequest(Client, message);        
             }
-
-
+            //send(Client, response, strlen(response), 0);
+            printf("%s", message);
         }
+
+        closesocket(Client);
+
     }
     return 0;
 }
